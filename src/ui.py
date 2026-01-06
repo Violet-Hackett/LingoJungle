@@ -27,8 +27,17 @@ class Renderable:
         root.blit(self._buffer)
 
     # Abstract method, internal rendering to a surface implementation ignoring the buffer
-    def _render_to(self, root: pygame.Surface):
+    def _render_to(self, root: pygame.Surface, position: tuple[int, int] = (0, 0)):
         raise NotImplementedError("Abstract _render_to() method must be implemented in child classes.")
+    
+class StaticTexture(Renderable):
+    def __init__(self, texture_name, position: tuple[int, int]):
+        super().__init__()
+        self.texture_name = texture_name
+        self.position = position
+
+    def _render_to(self, root: pygame.Surface):
+        root.blit(load_texture(self.texture_name), self.position)
 
 class LayerBuffer(Renderable):
     def __init__(self, renderables: list[Renderable]):
@@ -127,11 +136,11 @@ class Button(UIElement):
     def _render_button_texture_to(self, root: pygame.Surface):
         if self._show_button_texture:
             button_state_name = self.button_state.name.lower()
-            button_fp = f"\\button\\{button_state_name}"
+            button_subfolder = f"button\\{button_state_name}"
 
-            left = load_texture(f"{button_fp}\\button_{button_state_name}_left.png")
-            center = load_texture(f"{button_fp}\\button_{button_state_name}_center.png")
-            right = load_texture(f"{button_fp}\\button_{button_state_name}_right.png")
+            left = load_texture(f"{button_subfolder}\\button_{button_state_name}_left")
+            center = load_texture(f"{button_subfolder}\\button_{button_state_name}_center")
+            right = load_texture(f"{button_subfolder}\\button_{button_state_name}_right")
 
             [texture.fill(self._button_color, special_flags=pygame.BLEND_MULT) 
              for texture in (left, right, center)]
@@ -174,5 +183,5 @@ def render_ui_elements_to(root: pygame.Surface):
     for ui_element in _ui_elements:
         ui_element.render_to(root)
 
-def load_texture(subpath_in_textures_dir: str) -> pygame.Surface:
-    return pygame.image.load(f"{state.TEXTURES_FP}{subpath_in_textures_dir}").convert_alpha()
+def load_texture(texture_name: str) -> pygame.Surface:
+    return pygame.image.load(f"{state.TEXTURES_FP}\\{texture_name}.png").convert_alpha()
