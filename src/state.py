@@ -26,3 +26,4 @@ LINGOJUNGLE_FP = "C:\\Users\\bdboo\\OneDrive\\Documents\\Programming Projects\\L
 BIN_FP = f"{LINGOJUNGLE_FP}\\bin"
 FONTS_FP= f"{BIN_FP}\\fonts"
 TEXTURES_FP = f"{BIN_FP}\\textures"
+AUDIO_FP = f"{BIN_FP}\\audio"

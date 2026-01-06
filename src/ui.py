@@ -3,6 +3,7 @@ import pygame
 from typing import Callable
 import state
 from enum import Enum
+from audio_handler import AudioBuffer
 
 pygame.font.init()
 DEFAULT_FONT = pygame.font.Font(f"{state.FONTS_FP}\\Tiny5\\Tiny5-Regular.ttf", 8)
@@ -35,6 +36,14 @@ class StaticTexture(Renderable):
         super().__init__()
         self.texture_name = texture_name
         self.position = position
+
+    def set_position(self, position: tuple[int, int]):
+        self.position = position
+        self.flag_for_buffer_update()
+
+    def change_position(self, dx: int, dy: int):
+        self.position = (self.position[0] + dx, self.position[1] + dy)
+        self.flag_for_buffer_update()
 
     def _render_to(self, root: pygame.Surface):
         root.blit(load_texture(self.texture_name), self.position)
@@ -79,11 +88,15 @@ DEFAULT_TEXT_COLOR = pygame.Color(74, 73, 71)
 BUTTON_TEXTURE_MIN_WIDTH = 7
 BUTTON_TEXTURE_HEIGHT = 17
 BUTTON_PRESSED_Y_OFFSET = 2
+BUTTON_PRESS_SFX = AudioBuffer('button_press')
+BUTTON_RELEASE_SFX = AudioBuffer('button_release')
 class Button(UIElement):
     def __init__(self, function: Callable, hitbox: pygame.Rect, text: str|None = None, 
                  icon_id: str|None = None, button_color: pygame.Color = DEFAULT_BUTTON_COLOR,
                  text_color: pygame.Color = DEFAULT_TEXT_COLOR, 
-                 show_button_texture: bool = True, hold: bool = False):
+                 show_button_texture: bool = True, hold: bool = False, 
+                 press_sfx: AudioBuffer = BUTTON_PRESS_SFX, 
+                 release_sfx: AudioBuffer = BUTTON_RELEASE_SFX):
         super().__init__()
         self._function = function
         self._hitbox = hitbox
@@ -94,6 +107,8 @@ class Button(UIElement):
         self._show_button_texture = show_button_texture
         self._hold = hold
         self.button_state: ButtonState = ButtonState.UNTOUCHED
+        self._press_sfx = press_sfx
+        self._release_sfx = release_sfx
 
         self._check_texture_constraints()
         self._init_event_triggers()
@@ -112,9 +127,16 @@ class Button(UIElement):
             add_event_trigger_explicit(event_trigger)
 
     def _set_button_state(self, button_state: ButtonState):
-        if self.button_state != button_state:
+        old_button_state = self.button_state
+        if old_button_state != button_state:
             self.button_state = button_state
             self.flag_for_buffer_update()
+
+            # Play the appropriate sfx
+            if button_state == ButtonState.PRESSED:
+                self._press_sfx.play()
+            elif old_button_state == ButtonState.PRESSED:
+                self._release_sfx.play()
 
     def _untouched(self):
         self._set_button_state(ButtonState.UNTOUCHED)
