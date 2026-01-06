@@ -3,6 +3,8 @@ import sys
 import state
 import event_handler
 import ui
+from page import Page
+from pages.debug_page import DebugPage
 
 # Window setup
 pygame.init()
@@ -18,10 +20,10 @@ def quit():
 event_handler.add_event_trigger(quit, event_type = pygame.QUIT)
 event_handler.add_event_trigger(quit, event_key = pygame.K_ESCAPE)
 
-def test_function():
-    print("Test button pressed")
-test_button = ui.Button(test_function, pygame.Rect(10, 10, 50, 9), "Test")
-ui.add_ui_element(test_button)
+def print_debug_info():
+    print(f"{round(fpsClock.get_fps())}/{state.FPS} fps")
+
+current_page: Page = DebugPage()
 
 # Main app loop
 def main():
@@ -32,11 +34,15 @@ def main():
 
         frame_surface = pygame.Surface(state.ROOT_SIZE)
 
-        ui.render_ui_elements_to(frame_surface)
+        current_page.render_to(frame_surface)
 
         window.blit(pygame.transform.scale_by(frame_surface, state.SCALE))
 
         pygame.display.update()
         fpsClock.tick(state.FPS)
+        state.tick_count += 1
+
+        if state.DEBUG and state.tick_count % state.DEBUG_PRINT_INFO_FREQUENCY == 0:
+            print_debug_info()
  
 main()

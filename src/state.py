@@ -1,9 +1,13 @@
 RUNNING = True
 
+DEBUG = True
+DEBUG_PRINT_INFO_FREQUENCY = 180
+tick_count = 0
+
 # Framerate & display
 FPS = 60
-ROOT_SIZE = (120, 80)
-SCALE = 5
+ROOT_SIZE = (300, 200)
+SCALE = 3
 
 def root_width() -> int:
     return ROOT_SIZE[0]
@@ -21,3 +25,4 @@ def window_height() -> int:
 LINGOJUNGLE_FP = "C:\\Users\\bdboo\\OneDrive\\Documents\\Programming Projects\\LingoJungle"
 BIN_FP = f"{LINGOJUNGLE_FP}\\bin"
 FONTS_FP= f"{BIN_FP}\\fonts"
+TEXTURES_FP = f"{BIN_FP}\\textures"

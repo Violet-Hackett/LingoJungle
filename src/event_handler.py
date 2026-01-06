@@ -46,8 +46,16 @@ def add_event_trigger(triggered_function: Callable, untriggered_function: Callab
                  event_key: int|None = None, event_type: int|None = None,
                  hitbox: pygame.Rect|None = None):
     global _event_triggers
-    _event_triggers.append(EventTrigger(triggered_function, untriggered_function, event_key, 
+    add_event_trigger_explicit(EventTrigger(triggered_function, untriggered_function, event_key, 
                                         event_type, hitbox))
+    
+def add_event_trigger_explicit(event_trigger: EventTrigger):
+    global _event_triggers
+    _event_triggers.append(event_trigger)
+
+def remove_event_trigger(event_trigger: EventTrigger):
+    global _event_triggers
+    _event_triggers.remove(event_trigger)
 
 def apply_event_triggers():
     global _event_triggers
