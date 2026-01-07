@@ -12,7 +12,7 @@ class Page(ui.Renderable):
     def _construct(self):
         raise NotImplementedError()
     
-    def _destroy(self):
+    def destroy(self):
         for layer_buffer in self._layer_buffers:
             layer_buffer.destruct()
 

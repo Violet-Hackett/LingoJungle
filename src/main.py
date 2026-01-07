@@ -25,7 +25,7 @@ def print_debug_info():
     print(f"{round(fpsClock.get_fps())}/{state.FPS} fps, ", end="")
     print(f"{get_num_occupied_channels()}/{NUM_CHANNELS} audio channels busy")
 
-current_page: Page = MapPage()
+state.CURRENT_PAGE = MapPage()
 
 # Main app loop
 def main():
@@ -36,7 +36,7 @@ def main():
 
         frame_surface = pygame.Surface(state.ROOT_SIZE)
 
-        current_page.render_to(frame_surface)
+        state.CURRENT_PAGE.render_to(frame_surface)
 
         window.blit(pygame.transform.scale_by(frame_surface, state.SCALE))
 

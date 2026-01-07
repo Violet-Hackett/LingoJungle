@@ -1,4 +1,11 @@
 RUNNING = True
+CURRENT_PAGE = None
+
+def set_page(page):
+    global CURRENT_PAGE
+    if CURRENT_PAGE != None:
+        CURRENT_PAGE.destroy()
+    CURRENT_PAGE = page
 
 DEBUG = True
 DEBUG_PRINT_INFO_FREQUENCY = 180

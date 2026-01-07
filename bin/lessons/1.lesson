@@ -1,0 +1,8 @@
+{
+    "index": 1,
+    "title": "1",
+    "icon_name": "fish",
+    "map_color": [170, 239, 239],
+    "map_position": [140, 100],
+    "required_knowledge": 50
+}

@@ -4,10 +4,13 @@ import ui
 from event_handler import EventTrigger, add_event_trigger_explicit, get_relative_mouse_position
 import state
 from audio_handler import AudioBuffer
-from lesson import LESSONS
+from lesson import LESSONS, Lesson
+from pages.lesson_page import LessonPage
 from user import USER
+from functools import partial
 
 LESSON_UNLOCK_SFX = AudioBuffer("lesson_unlock")
+JUNGLE_AMBIENCE = AudioBuffer("jungle_ambience")
 class MapPage(Page):
     def __init__(self):
         self._lesson_buttons: list[ui.Button] = []
@@ -15,15 +18,14 @@ class MapPage(Page):
         self.unlock_new_lessons()
 
     def _construct(self):
-        jungle_ambience = AudioBuffer("jungle_ambience")
-        jungle_ambience.play(loops=-1, fade_ms=1000)
+        JUNGLE_AMBIENCE.play(loops=-1)
 
         map = ui.StaticTexture("jungle_roof", (-100, 0))
         lesson_buttons: list[ui.Button] = []
         for lesson in LESSONS:
             lesson_button_hitbox = pygame.Rect(*lesson.map_position, 15, 17)
             lesson_disabled = lesson.index not in USER.unlocked_lesson_indices
-            lesson_button = ui.Button(test_function, lesson_button_hitbox, 
+            lesson_button = ui.Button(partial(self.open_lesson_page, lesson), lesson_button_hitbox, 
                                                 button_color=lesson.map_color, 
                                                 icon_name=lesson.icon_name, 
                                                 disabled=lesson_disabled)
@@ -33,6 +35,10 @@ class MapPage(Page):
         map_buffer = ui.LayerBuffer([map] + lesson_buttons) # type: ignore
 
         self._layer_buffers = [map_buffer]
+
+    def open_lesson_page(self, lesson: Lesson):
+        JUNGLE_AMBIENCE.stop(1000)
+        state.set_page(LessonPage(lesson))
 
     def unlock_new_lessons(self):
         for lesson in LESSONS:
@@ -45,6 +51,3 @@ class MapPage(Page):
         # TODO: Fancy unlock animation
         USER.unlocked_lesson_indices.append(lesson_index)
         USER.save_data()
-
-def test_function():
-    print("test")
