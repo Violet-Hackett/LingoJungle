@@ -18,3 +18,6 @@ class AudioBuffer:
                 channel.play(self.sound, loops, fade_ms=fade_ms)
                 return
         print(f"WARNING: All {NUM_CHANNELS} audio channels occupied: cannot play {self._audio_file_name}.")
+
+def get_num_occupied_channels() -> int:
+    return len(list(filter(pygame.mixer.Channel.get_busy, CHANNELS)))

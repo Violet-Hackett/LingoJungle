@@ -1,0 +1,8 @@
+{
+    "index": 0,
+    "title": "Greeting",
+    "icon_name": "fish",
+    "map_color": [170, 239, 239],
+    "map_position": [80, 50],
+    "required_knowledge": 0
+}

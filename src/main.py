@@ -2,10 +2,9 @@ import pygame
 import sys
 import state
 import event_handler
-import ui
 from page import Page
-from pages.debug_page import DebugPage
 from pages.map_page import MapPage
+from audio_handler import get_num_occupied_channels, NUM_CHANNELS
 
 # Window setup
 pygame.init()
@@ -22,7 +21,9 @@ event_handler.add_event_trigger(quit, event_type = pygame.QUIT)
 event_handler.add_event_trigger(quit, event_key = pygame.K_ESCAPE)
 
 def print_debug_info():
-    print(f"{round(fpsClock.get_fps())}/{state.FPS} fps")
+    print(f"Tick {state.tick_count}: ", end="")
+    print(f"{round(fpsClock.get_fps())}/{state.FPS} fps, ", end="")
+    print(f"{get_num_occupied_channels()}/{NUM_CHANNELS} audio channels busy")
 
 current_page: Page = MapPage()
 

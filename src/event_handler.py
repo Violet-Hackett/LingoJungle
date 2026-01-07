@@ -5,19 +5,23 @@ import state
 class EventTrigger:
     def __init__(self, triggered_function: Callable, untriggered_function: Callable|None = None,
                  event_key: int|None = None, event_type: int|None = None,
-                 hitbox: pygame.Rect|None = None):
+                 hitbox: pygame.Rect|None = None, disabled: bool = False):
         self._triggered_function = triggered_function
         self._untriggered_function = untriggered_function
-
         self._event_type = event_type
         self._event_key = event_key
         self._hitbox = hitbox
+        self.disabled = disabled
+
         if event_type == None and event_key != None:
             self.event_type = pygame.KEYDOWN
         elif event_key == None and event_type == None and hitbox == None:
             raise Exception("Error initializing EventTrigger: event_key, event_type, and hitbox cannot all be None.")
 
     def apply(self, event: pygame.Event):
+
+        if self.disabled:
+            return
 
         call = False
         if self._event_type == event.type or self._event_type == None:

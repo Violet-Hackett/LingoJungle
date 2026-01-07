@@ -85,6 +85,7 @@ class ButtonState(Enum):
 
 DEFAULT_BUTTON_COLOR = pygame.Color(232, 229, 223)
 DEFAULT_TEXT_COLOR = pygame.Color(74, 73, 71)
+BUTTON_DISABLED_COLOR = pygame.Color(66, 64, 61)
 BUTTON_TEXTURE_MIN_WIDTH = 7
 BUTTON_TEXTURE_HEIGHT = 17
 BUTTON_PRESSED_Y_OFFSET = 2
@@ -92,16 +93,17 @@ BUTTON_PRESS_SFX = AudioBuffer('button_press')
 BUTTON_RELEASE_SFX = AudioBuffer('button_release')
 class Button(UIElement):
     def __init__(self, function: Callable, hitbox: pygame.Rect, text: str|None = None, 
-                 icon_id: str|None = None, button_color: pygame.Color = DEFAULT_BUTTON_COLOR,
+                 icon_name: str|None = None, button_color: pygame.Color = DEFAULT_BUTTON_COLOR,
                  text_color: pygame.Color = DEFAULT_TEXT_COLOR, 
                  show_button_texture: bool = True, hold: bool = False, 
                  press_sfx: AudioBuffer = BUTTON_PRESS_SFX, 
-                 release_sfx: AudioBuffer = BUTTON_RELEASE_SFX):
+                 release_sfx: AudioBuffer = BUTTON_RELEASE_SFX, disabled: bool = False,
+                 disabled_color: pygame.Color = BUTTON_DISABLED_COLOR):
         super().__init__()
         self._function = function
         self._hitbox = hitbox
         self._text = text
-        self._icon_id = icon_id
+        self._icon_name = icon_name
         self._button_color = button_color
         self._text_color = text_color
         self._show_button_texture = show_button_texture
@@ -109,9 +111,14 @@ class Button(UIElement):
         self.button_state: ButtonState = ButtonState.UNTOUCHED
         self._press_sfx = press_sfx
         self._release_sfx = release_sfx
+        self._disabled = disabled
+        self._disabled_color = disabled_color
 
         self._check_texture_constraints()
         self._init_event_triggers()
+
+        if disabled:
+            self.disable()
 
     def _init_event_triggers(self):
 
@@ -126,7 +133,24 @@ class Button(UIElement):
         for event_trigger in self._event_triggers:
             add_event_trigger_explicit(event_trigger)
 
+    def disable(self):
+        self._disabled = True
+        for event_trigger in self._event_triggers:
+            event_trigger.disabled = True
+            self.button_state = ButtonState.PRESSED
+        self.flag_for_buffer_update()
+
+    def enable(self):
+        self._disabled = False
+        for event_trigger in self._event_triggers:
+            event_trigger.disabled = False
+            self.button_state = ButtonState.UNTOUCHED
+        self.flag_for_buffer_update()
+
     def _set_button_state(self, button_state: ButtonState):
+        if self._disabled:
+            return
+            
         old_button_state = self.button_state
         if old_button_state != button_state:
             self.button_state = button_state
@@ -164,7 +188,8 @@ class Button(UIElement):
             center = load_texture(f"{button_subfolder}\\button_{button_state_name}_center")
             right = load_texture(f"{button_subfolder}\\button_{button_state_name}_right")
 
-            [texture.fill(self._button_color, special_flags=pygame.BLEND_MULT) 
+            button_color = self._button_color if not self._disabled else self._disabled_color
+            [texture.fill(button_color, special_flags=pygame.BLEND_MULT) 
              for texture in (left, right, center)]
 
             y = self._hitbox.top + self._get_texture_y_offset()
@@ -186,8 +211,13 @@ class Button(UIElement):
             root.blit(rendered_text, text_pos)
     
     def _render_icon_to(self, root: pygame.Surface):
-        if self._icon_id:
-            raise NotImplementedError()
+        if self._icon_name:
+            icon_texture = load_texture(f"icons\\{self._icon_name}")
+            color = self._button_color if not self._disabled else self._disabled_color
+            icon_texture.fill(color, special_flags=pygame.BLEND_MULT) 
+            icon_pos = (self._hitbox.left + 3, 
+                        self._hitbox.top + 2 + self._get_texture_y_offset())
+            root.blit(icon_texture, icon_pos)
     
     def _render_to(self, root: pygame.Surface):
         self._render_button_texture_to(root)
