@@ -5,6 +5,7 @@ import event_handler
 import ui
 from page import Page
 from pages.debug_page import DebugPage
+from pages.map_page import MapPage
 
 # Window setup
 pygame.init()
@@ -23,7 +24,7 @@ event_handler.add_event_trigger(quit, event_key = pygame.K_ESCAPE)
 def print_debug_info():
     print(f"{round(fpsClock.get_fps())}/{state.FPS} fps")
 
-current_page: Page = DebugPage()
+current_page: Page = MapPage()
 
 # Main app loop
 def main():

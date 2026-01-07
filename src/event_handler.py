@@ -59,8 +59,9 @@ def remove_event_trigger(event_trigger: EventTrigger):
 
 def apply_event_triggers():
     global _event_triggers
-    for event in pygame.event.get():
-        for event_trigger in _event_triggers:
+    events = pygame.event.get()
+    for event_trigger in _event_triggers:
+        for event in events:
             event_trigger.apply(event)
 
 # Converts window coordinates into root surface position
